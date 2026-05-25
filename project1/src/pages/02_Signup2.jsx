@@ -18,26 +18,29 @@ export default function Signup2() {
 
   const handleStart = async () => {
   if (interest.length < 2 || interest.length > 7) {
-    alert("관심사는 2~7자로 입력해주세요.");
+    setError("2~7자로 입력해주세요.");
     return;
   }
+  setError("");
   
   const signupData = JSON.parse(localStorage.getItem("signupData"));
-  const apiUrl = import.meta.env.VITE_API_URL || "https://duyuthon7.onrender.com";
-  
+  if (!signupData) {
+    alert("회원가입 정보를 다시 입력해주세요.");
+    navigate("/signup");
+    return;
+  }
+
   try {
-    const res = await axios.post(`${apiUrl}/api/auth/signup`, {
-      id: signupData.id,
+    await axios.post("/api/auth/signup", {  // ⭐ 상대 경로!
+      email: signupData.id,
       password: signupData.password,
+      name: signupData.id,
       interest: interest,
     });
-    
-    alert("회원가입 완료!");
     localStorage.removeItem("signupData");
     navigate("/login");
   } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "회원가입 실패");
+    setError(err.response?.data?.message || "회원가입에 실패했습니다.");
   }
 };
 
