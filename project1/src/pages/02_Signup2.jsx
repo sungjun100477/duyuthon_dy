@@ -1,214 +1,135 @@
-// 02_Signup2.jsx
-// 회원가입 - 환경 관심사 입력
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-function Signup2() {
-
-  // 페이지 이동용
+export default function Signup2() {
+  const [interest, setInterest] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // 환경 관심사 저장
-  const [interest, setInterest] = useState("");
+  // 이전 단계 데이터 확인
+  useEffect(() => {
+    const signupData = localStorage.getItem("signupData");
+    if (!signupData) {
+      alert("회원가입 정보를 다시 입력해주세요.");
+      navigate("/signup");
+    }
+  }, [navigate]);
 
-  // 오류 메시지 저장
-  const [error, setError] = useState("");
-
-  // 시작하기 버튼 클릭
-  const handleStart = () => {
-
-    // 글자 수 검사
-    if (
-      interest.length < 2 ||
-      interest.length > 7
-    ) {
+  const handleStart = async () => {
+    if (interest.length < 2 || interest.length > 7) {
       setError("2~7자로 입력해주세요.");
       return;
     }
-
-    // 오류 메시지 제거
     setError("");
 
-    // 이전 회원가입 정보 가져오기
-    const signupData =
-      JSON.parse(
-        localStorage.getItem("signupData")
-      ) || {};
+    const signupData = JSON.parse(localStorage.getItem("signupData"));
+    if (!signupData) {
+      alert("회원가입 정보를 다시 입력해주세요.");
+      navigate("/signup");
+      return;
+    }
 
-    // 최종 회원 정보
-    const userData = {
-      ...signupData,
-      interest
-    };
-
-    console.log("회원가입 정보");
-    console.log(userData);
-
-    /*
-      추후 Node.js 서버 연동
-
-      axios.post(
-        "http://localhost:5000/signup",
-        userData
-      )
-    */
-
-    // 홈 화면 이동
-    navigate("/");
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/signup`,
+        {
+          email: signupData.id,
+          password: signupData.password,
+          name: signupData.id,
+          interest: interest,
+        }
+      );
+      localStorage.removeItem("signupData");
+      navigate("/login");
+    } catch (err) {
+      setError(err.response?.data?.message || "회원가입에 실패했습니다.");
+    }
   };
 
   return (
-
-    // 전체 화면
     <div
       style={{
-        backgroundColor: "#F9F7ED",
         minHeight: "100vh",
-        position: "relative",
-        padding: "20px",
+        backgroundColor: "#F9F7ED",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "0 20px",
+        fontFamily: "sans-serif",
       }}
     >
-
-      {/* 상단 제목 */}
-      <div
+      <h1
         style={{
-          textAlign: "center",
-          fontSize: "20px",
+          fontSize: "28px",
           fontWeight: "bold",
-          marginTop: "10px"
-        }}
-      >
-        회원가입
-      </div>
-
-      {/* 환경 관심사 영역 */}
-      <div
-        style={{
-          marginTop: "40px",
-
-          //입력창 수정
-          display: "flex",
-          flexDirection: "column",
-          alignItems : "center"
-        }}
-      >
-
-        {/* 페이지 제목 */}
-        <h1
-          style={{
-            color: "black",
-            marginBottom: "100px"
-          }}
-        >
-          환경 관심사
-        </h1>
-
-        {/* 환경 관심사 입력 */}
-        <div
-          style={{
-            textAlign: "left",
-            marginBottom: "30px",
-
-            //width:"300px",
-            //maxWidth:"100%",
-            margin:"0 auto",
-            
-          }}
-        >
-
-          <label style={{ display: "block", marginBottom: "10px" }}>
-            관심사를 작성해주세요.
-          </label>
-
-          <input
-            type="text"
-            placeholder="예) 텀블러"
-
-            value={interest}
-            onChange={(e) =>
-              setInterest(e.target.value)
-            }
-
-            style={{
-              width:"100%",
-              maxWidth: "400px",
-            
-
-              padding: "10px",
-              marginTop: "5px",
-              backgroundColor: "white",
-              color: "black",
-              border: "none",
-              borderBottom: "1px solid #999"
-            }}
-          />
-
-          {/* 입력 조건 안내 */}
-          <p
-            style={{
-              color: "#777",
-              marginTop: "5px",
-              fontSize: "14px"
-            }}
-          >
-            * 2~7자로 입력해주세요.
-          </p>
-
-        </div>
-
-        {/* 오류 메시지 */}
-        {error && (
-          <p
-            style={{
-              color: "red"
-            }}
-          >
-            {error}
-          </p>
-        )}
-
-      </div>
-
-      {/* 시작하기 버튼 영역 */}
-      <div
-        style={{
-          position: "absolute",
-          marginTop: "100px",
-          // bottom: "200px",
-          left: 0,
-          width: "100%",
+          marginBottom: "10px",
           textAlign: "center",
-          
+          lineHeight: "1.4",
+          color: "black",
         }}
       >
+        RE:50과 가장 쉽게
+        <br />
+        지속가능 실천을
+        <br />
+        시작해볼까요?
+      </h1>
 
-        {/* 시작하기 버튼 */}
-        <button
-          onClick={handleStart}
-          style={{
-            width: "80%",
-            maxWidth: "400px",
-            backgroundColor: "#6EA1CC",
-            color: "white",
-            border: "none",
-            padding: "15px",
-            fontSize: "20px",
-            // 둥글게 곡선모양 버튼 처리
-            borderRadius: "50px",
-            cursor: "pointer",
+      <p
+        style={{
+          fontSize: "14px",
+          color: "#555",
+          marginBottom: "40px",
+          textAlign: "center",
+        }}
+      >
+        당신의 환경 관심사를 알려주세요
+      </p>
 
-            
-          }}
-        >
-          시작하기
-        </button>
+      <input
+        type="text"
+        placeholder="환경 관심사 (예: 제로웨이스트)"
+        value={interest}
+        onChange={(e) => setInterest(e.target.value)}
+        style={{
+          width: "80%",
+          padding: "12px 0",
+          fontSize: "16px",
+          border: "none",
+          borderBottom: "1px solid #999",
+          outline: "none",
+          backgroundColor: "transparent",
+          marginBottom: "10px",
+          textAlign: "center",
+          color: "black",
+        }}
+      />
 
-      </div>
+      {error && (
+        <p style={{ color: "red", fontSize: "13px", marginBottom: "20px" }}>
+          {error}
+        </p>
+      )}
 
+      <button
+        onClick={handleStart}
+        style={{
+          marginTop: "30px",
+          width: "80%",
+          padding: "14px",
+          fontSize: "16px",
+          fontWeight: "bold",
+          color: "white",
+          backgroundColor: "#6EA1CC",
+          border: "none",
+          borderRadius: "50px",
+          cursor: "pointer",
+        }}
+      >
+        시작하기
+      </button>
     </div>
-
   );
 }
-
-export default Signup2;

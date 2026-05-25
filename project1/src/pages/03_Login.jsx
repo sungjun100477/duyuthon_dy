@@ -1,214 +1,162 @@
-// 03_Login.jsx
-//3. 로그인 페이지
-
+//04_Login.jsx
+//로그인 페이지
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
-
-  // 페이지 이동용
   const navigate = useNavigate();
 
-  // 아이디 저장
   const [id, setId] = useState("");
-
-  // 비밀번호 저장
   const [password, setPassword] = useState("");
-
-  // 오류 메시지 저장
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 성공 메시지 저장
-  const [success, setSuccess] = useState("");
+  // ✅ 로그인 처리 함수
+  const handleLogin = async () => {
+    // 빈 값 체크
+    if (!id || !password) {
+      setError("아이디와 비밀번호를 입력해주세요.");
+      return;
+    }
 
-  // 시작하기 버튼 클릭
-  const handleLogin = () => {
+    setIsLoading(true);
+    setError("");
 
-    // 임시 로그인 정보 (추후 데이터베이스 연동시 변경)
-    const correctId = "admin";
-    const correctPassword = "2468";
+    try {
+      // 🚀 백엔드 로그인 API 호출
+      const response = await axios.post("http://localhost:3000/api/auth/login", {
+        email: id,
+        password: password
+      });
 
-    // 검사
-    if (
-      id === correctId &&
-      password === correctPassword
-    ) {
+      console.log("로그인 성공:", response.data);
 
-      // 오류 제거
-      setError("");
-      // 성공 메시지 설정
-      setSuccess("로그인에 성공했습니다!");
+      // ✅ JWT 토큰을 localStorage에 저장
+      localStorage.setItem("token", response.data.token);
 
-      setTimeout(() => {
-        // 메인 화면 이동
-        navigate("/home");
-      }, 2000);
+      // 로그인 성공 알림
+      alert("로그인 성공!");
 
+      // 메인 페이지로 이동
+      navigate("/main");
 
-    } else {
-
-      // 오류 메시지 출력
-      setError("아이디 혹은 비밀번호가 일치하지 않습니다.");
+    } catch (err) {
+      console.error("로그인 실패:", err);
+      
+      if (err.response) {
+        setError(err.response.data.message || "로그인에 실패했습니다.");
+      } else if (err.request) {
+        setError("서버에 연결할 수 없습니다.");
+      } else {
+        setError("로그인 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-
     <div
       style={{
         backgroundColor: "#F9F7ED",
+        color: "black",
         minHeight: "100vh",
-        //paddingTop: "50px",
-        //paddingLeft: "30px",
-        //paddingRight: "30px"
-        
-        // 전체 화면 가운데 정렬 코드
-        padding: "30px 20px",
-        display: "flex",
-        flexDirection: "column",  //세로 배치
-        alignItems: "center"  //모든 요소 가운데 정렬
+        paddingTop: "70px"
       }}
     >
+      <h1 style={{ color: "black" }}>로그인</h1>
 
-      {/* 제목 */}
-      <div style={{ width: "100%", maxWidth: "450px" }}>
-        <h1 style={{fontSize:"40px", color: "black", marginBottom: "30px" }}>
-          RE:50과 가장 쉽게
-        </h1>
-
-        <h1 style={{fontSize:"40px", color: "black", marginBottom: "30px" }}>
-          지속가능 실천을
-        </h1>
-        
-        <h1 style={{fontSize:"40px", color: "black", marginBottom: "20px" }}>
-          시작해볼까요?
-        </h1>
-      </div>
-
-      {/* 설명 */}
-      <p
-        style={{
-          color: "black"
-        }}
-      >
-        환경효과는 50회부터 쌓여요.
-        <br />
-        RE:Fifty는 그 시작을 가장 쉽게 만들어줘요.
-      </p>
-
-      {/* 입력 영역 */}
       <div
         style={{
-          marginTop: "50px",
           width: "100%",
-          maxWidth:"450px"
-
+          maxWidth: "500px",
+          margin: "0 auto",
+          marginTop: "50px"
         }}
       >
-
-        {/* 아이디 */}
-        <div
-          style={{
-            marginBottom: "25px"
-          }}
-        >
-
-          <label style= {{ display: "block"}}>아이디</label>
-        
-
+        {/* 아이디(이메일) 입력 */}
+        <div style={{ textAlign: "left", marginBottom: "20px" }}>
+          <label>아이디(Email)</label>
           <input
-            type="text"
+            type="email"
+            placeholder="이메일을 입력하세요"
             value={id}
             onChange={(e) => setId(e.target.value)}
             style={{
-              width: "100%",
+              backgroundColor: "white",
+              color: "black",
+              width: "90%",
               padding: "10px",
               marginTop: "5px",
-              
-              color:"black",
-              backgroundColor: "white",
-              border: "2px solid black",
-
-              boxSizing: "border-box"
-
+              border: "2px solid black"
             }}
           />
-
         </div>
 
-        {/* 비밀번호 */}
-        <div>
-
-          <label style= {{ display: "block"}}>비밀번호</label>
-
+        {/* 비밀번호 입력 */}
+        <div style={{ textAlign: "left", marginBottom: "30px" }}>
+          <label>비밀번호</label>
           <input
             type="password"
+            placeholder="비밀번호를 입력하세요"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
             style={{
-              width: "100%",
+              color: "black",
+              backgroundColor: "white",
+              width: "90%",
               padding: "10px",
               marginTop: "5px",
-
-              color:"black",
-              backgroundColor: "white",
-              border: "2px solid black",
-
-              boxSizing:"border-box"
+              border: "2px solid black"
             }}
           />
-
         </div>
 
-      </div>
+        {/* 오류 메시지 */}
+        {error && (
+          <p style={{ color: "red", marginBottom: "15px" }}>
+            {error}
+          </p>
+        )}
 
-      {/* 오류 메시지 */}
-      {error && (
-
-        <p
+        {/* 로그인 버튼 */}
+        <button
+          onClick={handleLogin}
+          disabled={isLoading}
           style={{
-            color: "red",
-            marginTop: "20px"
+            backgroundColor: isLoading ? "#aaa" : "#6EA1CC",
+            width: "80%",
+            padding: "15px",
+            fontSize: "20px",
+            cursor: isLoading ? "not-allowed" : "pointer",
+            borderRadius: "50px",
+            border: "none",
+            marginBottom: "15px"
           }}
         >
-          {error}
+          {isLoading ? "로그인 중..." : "로그인"}
+        </button>
+
+        {/* 회원가입 페이지로 이동 */}
+        <p>
+          계정이 없으신가요?{" "}
+          <span
+            onClick={() => navigate("/signup")}
+            style={{
+              color: "#6EA1CC",
+              cursor: "pointer",
+              textDecoration: "underline"
+            }}
+          >
+            회원가입
+          </span>
         </p>
-
-      )}
-      {/* 성공 메시지*/}
-      {success && (
-        <p
-          style={{
-            color: "green",
-            marginTop: "20px"
-       }}
-       >
-        {success}
-      </p>
-    )}
-
-      {/* 시작하기 버튼 */}
-      <button
-        onClick={handleLogin}
-        style={{
-          width: "100%",
-          maxWidth:"450px",
-
-          padding: "15px",
-          marginTop: "50px",
-          backgroundColor: "#6EA1CC",
-          color: "white",
-          border: "none",
-          borderRadius: "50px",
-          fontSize: "18px",
-          cursor: "pointer"
-        }}
-      >
-        시작하기
-      </button>
-
+      </div>
     </div>
-
   );
 }
 
