@@ -7,7 +7,7 @@ import axios from "axios";
 function Login() {
   const navigate = useNavigate();
 
-  const [id, setId] = useState("");
+  const [email, setId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
