@@ -15,7 +15,7 @@ function Login() {
   // ✅ 로그인 처리 함수
   const handleLogin = async () => {
     // 빈 값 체크
-    if (!id || !password) {
+    if (!email || !password) {
       setError("아이디와 비밀번호를 입력해주세요.");
       return;
     }
