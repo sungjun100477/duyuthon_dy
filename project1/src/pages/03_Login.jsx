@@ -1,4 +1,4 @@
-//04_Login.jsx
+//03_Login.jsx
 //로그인 페이지
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +22,12 @@ function Login() {
 
     setIsLoading(true);
     setError("");
+  {
+    const apiUrl = import.meta.env.VITE_API_URL || "https://duyuthon7.onrender.com";
 
     try {
       // 🚀 백엔드 로그인 API 호출
-      const response = await axios.post("http://localhost:3000/api/auth/login", {
+      const response = await axios.post("${apiUrl}/api/auth/login", {
         email: id,
         password: password
       });
@@ -54,7 +56,7 @@ function Login() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }};
 
   return (
     <div

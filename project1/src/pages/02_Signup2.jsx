@@ -17,35 +17,29 @@ export default function Signup2() {
   }, [navigate]);
 
   const handleStart = async () => {
-    if (interest.length < 2 || interest.length > 7) {
-      setError("2~7자로 입력해주세요.");
-      return;
-    }
-    setError("");
-
-    const signupData = JSON.parse(localStorage.getItem("signupData"));
-    if (!signupData) {
-      alert("회원가입 정보를 다시 입력해주세요.");
-      navigate("/signup");
-      return;
-    }
-
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/signup`,
-        {
-          email: signupData.id,
-          password: signupData.password,
-          name: signupData.id,
-          interest: interest,
-        }
-      );
-      localStorage.removeItem("signupData");
-      navigate("/login");
-    } catch (err) {
-      setError(err.response?.data?.message || "회원가입에 실패했습니다.");
-    }
-  };
+  if (interest.length < 2 || interest.length > 7) {
+    alert("관심사는 2~7자로 입력해주세요.");
+    return;
+  }
+  
+  const signupData = JSON.parse(localStorage.getItem("signupData"));
+  const apiUrl = import.meta.env.VITE_API_URL || "https://duyuthon7.onrender.com";
+  
+  try {
+    const res = await axios.post(`${apiUrl}/api/auth/signup`, {
+      id: signupData.id,
+      password: signupData.password,
+      interest: interest,
+    });
+    
+    alert("회원가입 완료!");
+    localStorage.removeItem("signupData");
+    navigate("/login");
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "회원가입 실패");
+  }
+};
 
   return (
     <div
