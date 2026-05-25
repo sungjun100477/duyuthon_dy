@@ -31,7 +31,7 @@ export default function Signup2() {
   }
 
   try {
-    await axios.post("/api/auth/signup", {  // ⭐ 상대 경로!
+    await axios.post("https://duyuthon7.onrender.com/api/auth/signup", {  // ⭐ 상대 경로!
       email: signupData.id,
       password: signupData.password,
       name: signupData.id,
